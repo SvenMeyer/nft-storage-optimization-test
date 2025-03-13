@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Use specific version 0.8.28 with via-ir for optimization
-pragma solidity 0.8.28;
+pragma solidity >=0.8.28;
 
 contract StorageTest {
     // IMPORTANT: This contract demonstrates storage slot usage in Solidity

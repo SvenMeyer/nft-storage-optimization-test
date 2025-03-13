@@ -4,6 +4,8 @@ This document presents our findings from testing different approaches to storing
 
 ## Overview of Test Results
 
+solc 0.8.28 , evmVersion: 'paris'
+
 | Storage Pattern                       | Gas Used | vs. bytes32 |
 |---------------------------------------|----------|------------:|
 | 1. bytes32 packed in mapping          | 53,472   | 100%        |
@@ -12,6 +14,19 @@ This document presents our findings from testing different approaches to storing
 | 4. uint32 + uint16[14] within struct  | 79,939   | 149%        |
 | 5. uint16[16] within struct           | 80,793   | 151%        |
 | 6. 16 separate uint16 mappings        | 402,902  | 754%        |
+
+
+solc 0.8.29 , evmVersion: 'shanghai'
+
+| Storage Pattern | Gas Used | vs. bytes32 |
+|-----------------|-----------|------------|
+| 1. bytes32 packed in mapping | 53466 | 100% |
+| 2. Struct with packed uint16 fields | 54894 | 102% |
+| 3. uint16[16] array in mapping | 61075 | 114% |
+| 4. uint32 + uint16[14] within struct | 79929 | 149% |
+| 5. uint16[16] within struct | 80782 | 151% |
+| 6. 16 separate uint16 mappings | 402866 | 753% |
+
 
 ## Storage Patterns in Detail
 

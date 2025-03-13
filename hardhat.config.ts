@@ -3,8 +3,10 @@ import "@nomicfoundation/hardhat-toolbox";
 
 const config: HardhatUserConfig = {
   solidity: {
-    version: "0.8.28",
+    version: "0.8.29",
+    
     settings: {
+      evmVersion: "shanghai",
       optimizer: {
         enabled: true,
         runs: 200,
