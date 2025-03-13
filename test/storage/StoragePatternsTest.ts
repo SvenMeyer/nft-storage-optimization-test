@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
 
-import type { StoragePatterns } from "../../types/contracts/StoragePatterns";
+import { StoragePatterns } from "../../typechain-types/StoragePatterns";
 
 // Helper function to add some delay to ensure storage operations complete
 function delay(ms: number): Promise<void> {
@@ -24,36 +24,42 @@ describe("NFT Properties Storage Test", function () {
     // Measure gas for minting with individual properties
     const tx1 = await nftPropertiesTest.mintWithIndividualProperties(testValues);
     const receipt1 = await tx1.wait();
+    if (!receipt1) throw new Error("Transaction failed");
     const individualGas = receipt1.gasUsed;
     const tokenId1 = await nftPropertiesTest.totalMinted() - BigInt(1);
     
     // Measure gas for minting with array properties
     const tx2 = await nftPropertiesTest.mintWithArrayProperties(testValues);
     const receipt2 = await tx2.wait();
+    if (!receipt2) throw new Error("Transaction failed");
     const arrayGas = receipt2.gasUsed;
     const tokenId2 = await nftPropertiesTest.totalMinted() - BigInt(1);
     
     // Measure gas for minting with packed bytes32 properties
     const tx3 = await nftPropertiesTest.mintWithPackedProperties(testValues);
     const receipt3 = await tx3.wait();
+    if (!receipt3) throw new Error("Transaction failed");
     const bytes32Gas = receipt3.gasUsed;
     const tokenId3 = await nftPropertiesTest.totalMinted() - BigInt(1);
     
     // Measure gas for minting with struct properties
     const tx4 = await nftPropertiesTest.mintWithStructProperties(testValues);
     const receipt4 = await tx4.wait();
+    if (!receipt4) throw new Error("Transaction failed");
     const structGas = receipt4.gasUsed;
     const tokenId4 = await nftPropertiesTest.totalMinted() - BigInt(1);
     
     // Measure gas for minting with struct containing array properties
     const tx5 = await nftPropertiesTest.mintWithStructArrayProperties(testValues);
     const receipt5 = await tx5.wait();
+    if (!receipt5) throw new Error("Transaction failed");
     const structArrayGas = receipt5.gasUsed;
     const tokenId5 = await nftPropertiesTest.totalMinted() - BigInt(1);
     
     // Measure gas for minting with a packed struct containing uint32 + uint16[14] array
     const tx6 = await nftPropertiesTest.mintWithPackedArrayStruct(testValues);
     const receipt6 = await tx6.wait();
+    if (!receipt6) throw new Error("Transaction failed");
     const packedArrayStructGas = receipt6.gasUsed;
     const tokenId6 = await nftPropertiesTest.totalMinted() - BigInt(1);
     
@@ -92,23 +98,14 @@ describe("NFT Properties Storage Test", function () {
       return Math.round(Number((gas * BigInt(100)) / baseline));
     };
     
-    console.log("\nRELATIVE GAS COSTS (bytes32 = 100%)\n" +
-                "----------------------------------");
-    console.log(`Individual mappings:     ${getPercentage(individualGas, bytes32Gas)}%`);
-    console.log(`Array in mapping:        ${getPercentage(arrayGas, bytes32Gas)}%`);
-    console.log(`Packed bytes32:          100%`);
-    console.log(`Packed struct:           ${getPercentage(structGas, bytes32Gas)}%`);
-    console.log(`Struct with array:       ${getPercentage(structArrayGas, bytes32Gas)}%`);
-    console.log(`uint32 + uint16[14]:     ${getPercentage(packedArrayStructGas, bytes32Gas)}%`);
-    
-    // Calculate gas differences
-    console.log("\nGAS COST DIFFERENCES\n" +
-                "--------------------");
-    console.log(`Individual vs. Packed bytes32:      ${individualGas - bytes32Gas} gas`);
-    console.log(`Array vs. Packed bytes32:           ${arrayGas - bytes32Gas} gas`);
-    console.log(`Struct vs. Packed bytes32:          ${structGas - bytes32Gas} gas`);
-    console.log(`Struct with array vs. Array:        ${structArrayGas - arrayGas} gas`);
-    console.log(`uint32 + uint16[14] vs. bytes32:    ${packedArrayStructGas - bytes32Gas} gas`);
-    console.log(`uint32 + uint16[14] vs. Array:      ${packedArrayStructGas - arrayGas} gas`);
+    // Print results in markdown table format
+    console.log("| Storage Pattern | Gas Used | vs. bytes32 |");
+    console.log("|-----------------|-----------|------------|");
+    console.log(`| 1. bytes32 packed in mapping | ${bytes32Gas} | 100% |`);
+    console.log(`| 2. Struct with packed uint16 fields | ${structGas} | ${getPercentage(structGas, bytes32Gas)}% |`);
+    console.log(`| 3. uint16[16] array in mapping | ${arrayGas} | ${getPercentage(arrayGas, bytes32Gas)}% |`);
+    console.log(`| 4. uint32 + uint16[14] within struct | ${packedArrayStructGas} | ${getPercentage(packedArrayStructGas, bytes32Gas)}% |`);
+    console.log(`| 5. uint16[16] within struct | ${structArrayGas} | ${getPercentage(structArrayGas, bytes32Gas)}% |`);
+    console.log(`| 6. 16 separate uint16 mappings | ${individualGas} | ${getPercentage(individualGas, bytes32Gas)}% |`);
   });
 });
